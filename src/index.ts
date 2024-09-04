@@ -3,6 +3,8 @@ import { postgraphile } from "postgraphile";
 
 const app = express();
 
+console.log("Hey");
+
 app.use(
   postgraphile(
     "postgres://postgres:postgres@localhost:5432/grafast",
