@@ -1,0 +1,1279 @@
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """Reads and enables pagination through a set of `Item`."""
+  items(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Item`."""
+    orderBy: [ItemsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ItemCondition
+  ): ItemsConnection
+
+  """Reads and enables pagination through a set of `VehicleMileage`."""
+  vehicleMileages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `VehicleMileage`."""
+    orderBy: [VehicleMileagesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VehicleMileageCondition
+  ): VehicleMileagesConnection
+
+  """Reads and enables pagination through a set of `Vehicle`."""
+  vehicles(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Vehicle`."""
+    orderBy: [VehiclesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VehicleCondition
+  ): VehiclesConnection
+  item(id: BigInt!): Item
+  vehicleMileage(id: BigInt!): VehicleMileage
+  vehicle(itemId: BigInt!): Vehicle
+
+  """Reads a single `Item` using its globally unique `ID`."""
+  itemByNodeId(
+    """The globally unique `ID` to be used in selecting a single `Item`."""
+    nodeId: ID!
+  ): Item
+
+  """Reads a single `VehicleMileage` using its globally unique `ID`."""
+  vehicleMileageByNodeId(
+    """
+    The globally unique `ID` to be used in selecting a single `VehicleMileage`.
+    """
+    nodeId: ID!
+  ): VehicleMileage
+
+  """Reads a single `Vehicle` using its globally unique `ID`."""
+  vehicleByNodeId(
+    """The globally unique `ID` to be used in selecting a single `Vehicle`."""
+    nodeId: ID!
+  ): Vehicle
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""A connection to a list of `Item` values."""
+type ItemsConnection {
+  """A list of `Item` objects."""
+  nodes: [Item]!
+
+  """
+  A list of edges which contains the `Item` and cursor to aid in pagination.
+  """
+  edges: [ItemsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Item` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Item implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: BigInt!
+  manufacturerSerialNo: String
+  internalSerialNo: String
+  purchasePrice: BigFloat
+  purchaseDate: Datetime
+  quantity: Int!
+  status: ItemStatus!
+  type: ItemType!
+
+  """Reads a single `Vehicle` that is related to this `Item`."""
+  vehicle: Vehicle
+
+  """Reads and enables pagination through a set of `Vehicle`."""
+  vehicles(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Vehicle`."""
+    orderBy: [VehiclesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VehicleCondition
+  ): VehiclesConnection! @deprecated(reason: "Please use vehicle instead")
+}
+
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+"""
+A floating point number that requires more precision than IEEE 754 binary 64
+"""
+scalar BigFloat
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+"""
+scalar Datetime
+
+enum ItemStatus {
+  CREATED
+  PURCHASED
+  DELIVERED
+  ACCEPTED
+  INSERVICE
+  MAINTENANCE
+  STORAGE
+  RETIRED
+  DISPOSED
+  SOLD
+}
+
+enum ItemType {
+  VEHICLE
+}
+
+type Vehicle implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  itemId: BigInt!
+  chassisNo: String
+  licenseNo: String
+  name: String!
+  description: String
+  purchaseMileage: BigInt!
+  manufacturer: String
+  manufactureYear: Int
+  manufactureCountry: String
+  model: String
+  color: String
+  wheelcount: Int!
+  engineCc: Int
+  transmissionType: String
+  fuelType: String
+  steeringType: String
+  brakeType: String
+  driveType: String
+  fuelCapacity: BigFloat
+  fuelEfficiencyKmL: BigFloat
+  maxPassengers: Int
+  maxCargoKg: BigFloat
+  maxCargoCap: BigFloat
+  ammenities: JSON
+
+  """Reads a single `Item` that is related to this `Vehicle`."""
+  item: Item
+
+  """Reads and enables pagination through a set of `VehicleMileage`."""
+  vehicleMileages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `VehicleMileage`."""
+    orderBy: [VehicleMileagesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VehicleMileageCondition
+  ): VehicleMileagesConnection!
+}
+
+"""
+A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""A connection to a list of `VehicleMileage` values."""
+type VehicleMileagesConnection {
+  """A list of `VehicleMileage` objects."""
+  nodes: [VehicleMileage]!
+
+  """
+  A list of edges which contains the `VehicleMileage` and cursor to aid in pagination.
+  """
+  edges: [VehicleMileagesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `VehicleMileage` you could get from the connection."""
+  totalCount: Int!
+}
+
+type VehicleMileage implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: BigInt!
+  vehicleId: BigInt
+  mileage: Int!
+  recordDate: Datetime!
+
+  """Reads a single `Vehicle` that is related to this `VehicleMileage`."""
+  vehicle: Vehicle
+}
+
+"""A `VehicleMileage` edge in the connection."""
+type VehicleMileagesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `VehicleMileage` at the end of the edge."""
+  node: VehicleMileage
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""Methods to use when ordering `VehicleMileage`."""
+enum VehicleMileagesOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  VEHICLE_ID_ASC
+  VEHICLE_ID_DESC
+  MILEAGE_ASC
+  MILEAGE_DESC
+  RECORD_DATE_ASC
+  RECORD_DATE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `VehicleMileage` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input VehicleMileageCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: BigInt
+
+  """Checks for equality with the object’s `vehicleId` field."""
+  vehicleId: BigInt
+
+  """Checks for equality with the object’s `mileage` field."""
+  mileage: Int
+
+  """Checks for equality with the object’s `recordDate` field."""
+  recordDate: Datetime
+}
+
+"""A connection to a list of `Vehicle` values."""
+type VehiclesConnection {
+  """A list of `Vehicle` objects."""
+  nodes: [Vehicle]!
+
+  """
+  A list of edges which contains the `Vehicle` and cursor to aid in pagination.
+  """
+  edges: [VehiclesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Vehicle` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Vehicle` edge in the connection."""
+type VehiclesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Vehicle` at the end of the edge."""
+  node: Vehicle
+}
+
+"""Methods to use when ordering `Vehicle`."""
+enum VehiclesOrderBy {
+  NATURAL
+  ITEM_ID_ASC
+  ITEM_ID_DESC
+  CHASSIS_NO_ASC
+  CHASSIS_NO_DESC
+  LICENSE_NO_ASC
+  LICENSE_NO_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  PURCHASE_MILEAGE_ASC
+  PURCHASE_MILEAGE_DESC
+  MANUFACTURER_ASC
+  MANUFACTURER_DESC
+  MANUFACTURE_YEAR_ASC
+  MANUFACTURE_YEAR_DESC
+  MANUFACTURE_COUNTRY_ASC
+  MANUFACTURE_COUNTRY_DESC
+  MODEL_ASC
+  MODEL_DESC
+  COLOR_ASC
+  COLOR_DESC
+  WHEELCOUNT_ASC
+  WHEELCOUNT_DESC
+  ENGINE_CC_ASC
+  ENGINE_CC_DESC
+  TRANSMISSION_TYPE_ASC
+  TRANSMISSION_TYPE_DESC
+  FUEL_TYPE_ASC
+  FUEL_TYPE_DESC
+  STEERING_TYPE_ASC
+  STEERING_TYPE_DESC
+  BRAKE_TYPE_ASC
+  BRAKE_TYPE_DESC
+  DRIVE_TYPE_ASC
+  DRIVE_TYPE_DESC
+  FUEL_CAPACITY_ASC
+  FUEL_CAPACITY_DESC
+  FUEL_EFFICIENCY_KM_L_ASC
+  FUEL_EFFICIENCY_KM_L_DESC
+  MAX_PASSENGERS_ASC
+  MAX_PASSENGERS_DESC
+  MAX_CARGO_KG_ASC
+  MAX_CARGO_KG_DESC
+  MAX_CARGO_CAP_ASC
+  MAX_CARGO_CAP_DESC
+  AMMENITIES_ASC
+  AMMENITIES_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Vehicle` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input VehicleCondition {
+  """Checks for equality with the object’s `itemId` field."""
+  itemId: BigInt
+
+  """Checks for equality with the object’s `chassisNo` field."""
+  chassisNo: String
+
+  """Checks for equality with the object’s `licenseNo` field."""
+  licenseNo: String
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `purchaseMileage` field."""
+  purchaseMileage: BigInt
+
+  """Checks for equality with the object’s `manufacturer` field."""
+  manufacturer: String
+
+  """Checks for equality with the object’s `manufactureYear` field."""
+  manufactureYear: Int
+
+  """Checks for equality with the object’s `manufactureCountry` field."""
+  manufactureCountry: String
+
+  """Checks for equality with the object’s `model` field."""
+  model: String
+
+  """Checks for equality with the object’s `color` field."""
+  color: String
+
+  """Checks for equality with the object’s `wheelcount` field."""
+  wheelcount: Int
+
+  """Checks for equality with the object’s `engineCc` field."""
+  engineCc: Int
+
+  """Checks for equality with the object’s `transmissionType` field."""
+  transmissionType: String
+
+  """Checks for equality with the object’s `fuelType` field."""
+  fuelType: String
+
+  """Checks for equality with the object’s `steeringType` field."""
+  steeringType: String
+
+  """Checks for equality with the object’s `brakeType` field."""
+  brakeType: String
+
+  """Checks for equality with the object’s `driveType` field."""
+  driveType: String
+
+  """Checks for equality with the object’s `fuelCapacity` field."""
+  fuelCapacity: BigFloat
+
+  """Checks for equality with the object’s `fuelEfficiencyKmL` field."""
+  fuelEfficiencyKmL: BigFloat
+
+  """Checks for equality with the object’s `maxPassengers` field."""
+  maxPassengers: Int
+
+  """Checks for equality with the object’s `maxCargoKg` field."""
+  maxCargoKg: BigFloat
+
+  """Checks for equality with the object’s `maxCargoCap` field."""
+  maxCargoCap: BigFloat
+
+  """Checks for equality with the object’s `ammenities` field."""
+  ammenities: JSON
+}
+
+"""A `Item` edge in the connection."""
+type ItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Item` at the end of the edge."""
+  node: Item
+}
+
+"""Methods to use when ordering `Item`."""
+enum ItemsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  MANUFACTURER_SERIAL_NO_ASC
+  MANUFACTURER_SERIAL_NO_DESC
+  INTERNAL_SERIAL_NO_ASC
+  INTERNAL_SERIAL_NO_DESC
+  PURCHASE_PRICE_ASC
+  PURCHASE_PRICE_DESC
+  PURCHASE_DATE_ASC
+  PURCHASE_DATE_DESC
+  QUANTITY_ASC
+  QUANTITY_DESC
+  STATUS_ASC
+  STATUS_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Item` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input ItemCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: BigInt
+
+  """Checks for equality with the object’s `manufacturerSerialNo` field."""
+  manufacturerSerialNo: String
+
+  """Checks for equality with the object’s `internalSerialNo` field."""
+  internalSerialNo: String
+
+  """Checks for equality with the object’s `purchasePrice` field."""
+  purchasePrice: BigFloat
+
+  """Checks for equality with the object’s `purchaseDate` field."""
+  purchaseDate: Datetime
+
+  """Checks for equality with the object’s `quantity` field."""
+  quantity: Int
+
+  """Checks for equality with the object’s `status` field."""
+  status: ItemStatus
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Item`."""
+  createItem(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateItemInput!
+  ): CreateItemPayload
+
+  """Creates a single `VehicleMileage`."""
+  createVehicleMileage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateVehicleMileageInput!
+  ): CreateVehicleMileagePayload
+
+  """Creates a single `Vehicle`."""
+  createVehicle(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateVehicleInput!
+  ): CreateVehiclePayload
+
+  """Updates a single `Item` using its globally unique id and a patch."""
+  updateItemByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateItemByNodeIdInput!
+  ): UpdateItemPayload
+
+  """Updates a single `Item` using a unique key and a patch."""
+  updateItem(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateItemInput!
+  ): UpdateItemPayload
+
+  """
+  Updates a single `VehicleMileage` using its globally unique id and a patch.
+  """
+  updateVehicleMileageByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateVehicleMileageByNodeIdInput!
+  ): UpdateVehicleMileagePayload
+
+  """Updates a single `VehicleMileage` using a unique key and a patch."""
+  updateVehicleMileage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateVehicleMileageInput!
+  ): UpdateVehicleMileagePayload
+
+  """Updates a single `Vehicle` using its globally unique id and a patch."""
+  updateVehicleByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateVehicleByNodeIdInput!
+  ): UpdateVehiclePayload
+
+  """Updates a single `Vehicle` using a unique key and a patch."""
+  updateVehicle(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateVehicleInput!
+  ): UpdateVehiclePayload
+
+  """Deletes a single `Item` using its globally unique id."""
+  deleteItemByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteItemByNodeIdInput!
+  ): DeleteItemPayload
+
+  """Deletes a single `Item` using a unique key."""
+  deleteItem(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteItemInput!
+  ): DeleteItemPayload
+
+  """Deletes a single `VehicleMileage` using its globally unique id."""
+  deleteVehicleMileageByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteVehicleMileageByNodeIdInput!
+  ): DeleteVehicleMileagePayload
+
+  """Deletes a single `VehicleMileage` using a unique key."""
+  deleteVehicleMileage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteVehicleMileageInput!
+  ): DeleteVehicleMileagePayload
+
+  """Deletes a single `Vehicle` using its globally unique id."""
+  deleteVehicleByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteVehicleByNodeIdInput!
+  ): DeleteVehiclePayload
+
+  """Deletes a single `Vehicle` using a unique key."""
+  deleteVehicle(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteVehicleInput!
+  ): DeleteVehiclePayload
+}
+
+"""The output of our create `Item` mutation."""
+type CreateItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Item` that was created by this mutation."""
+  item: Item
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Item`. May be used by Relay 1."""
+  itemEdge(
+    """The method to use when ordering `Item`."""
+    orderBy: [ItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ItemsEdge
+}
+
+"""All input for the create `Item` mutation."""
+input CreateItemInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Item` to be created by this mutation."""
+  item: ItemInput!
+}
+
+"""An input for mutations affecting `Item`"""
+input ItemInput {
+  id: BigInt
+  manufacturerSerialNo: String
+  internalSerialNo: String
+  purchasePrice: BigFloat
+  purchaseDate: Datetime
+  quantity: Int
+  status: ItemStatus
+  type: ItemType!
+}
+
+"""The output of our create `VehicleMileage` mutation."""
+type CreateVehicleMileagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `VehicleMileage` that was created by this mutation."""
+  vehicleMileage: VehicleMileage
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Vehicle` that is related to this `VehicleMileage`."""
+  vehicle: Vehicle
+
+  """An edge for our `VehicleMileage`. May be used by Relay 1."""
+  vehicleMileageEdge(
+    """The method to use when ordering `VehicleMileage`."""
+    orderBy: [VehicleMileagesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): VehicleMileagesEdge
+}
+
+"""All input for the create `VehicleMileage` mutation."""
+input CreateVehicleMileageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `VehicleMileage` to be created by this mutation."""
+  vehicleMileage: VehicleMileageInput!
+}
+
+"""An input for mutations affecting `VehicleMileage`"""
+input VehicleMileageInput {
+  id: BigInt
+  vehicleId: BigInt
+  mileage: Int!
+  recordDate: Datetime
+}
+
+"""The output of our create `Vehicle` mutation."""
+type CreateVehiclePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Vehicle` that was created by this mutation."""
+  vehicle: Vehicle
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Item` that is related to this `Vehicle`."""
+  item: Item
+
+  """An edge for our `Vehicle`. May be used by Relay 1."""
+  vehicleEdge(
+    """The method to use when ordering `Vehicle`."""
+    orderBy: [VehiclesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): VehiclesEdge
+}
+
+"""All input for the create `Vehicle` mutation."""
+input CreateVehicleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Vehicle` to be created by this mutation."""
+  vehicle: VehicleInput!
+}
+
+"""An input for mutations affecting `Vehicle`"""
+input VehicleInput {
+  itemId: BigInt
+  chassisNo: String
+  licenseNo: String
+  name: String!
+  description: String
+  purchaseMileage: BigInt!
+  manufacturer: String
+  manufactureYear: Int
+  manufactureCountry: String
+  model: String
+  color: String
+  wheelcount: Int
+  engineCc: Int
+  transmissionType: String
+  fuelType: String
+  steeringType: String
+  brakeType: String
+  driveType: String
+  fuelCapacity: BigFloat
+  fuelEfficiencyKmL: BigFloat
+  maxPassengers: Int
+  maxCargoKg: BigFloat
+  maxCargoCap: BigFloat
+  ammenities: JSON
+}
+
+"""The output of our update `Item` mutation."""
+type UpdateItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Item` that was updated by this mutation."""
+  item: Item
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Item`. May be used by Relay 1."""
+  itemEdge(
+    """The method to use when ordering `Item`."""
+    orderBy: [ItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ItemsEdge
+}
+
+"""All input for the `updateItemByNodeId` mutation."""
+input UpdateItemByNodeIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Item` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Item` being updated.
+  """
+  patch: ItemPatch!
+}
+
+"""Represents an update to a `Item`. Fields that are set will be updated."""
+input ItemPatch {
+  id: BigInt
+  manufacturerSerialNo: String
+  internalSerialNo: String
+  purchasePrice: BigFloat
+  purchaseDate: Datetime
+  quantity: Int
+  status: ItemStatus
+  type: ItemType
+}
+
+"""All input for the `updateItem` mutation."""
+input UpdateItemInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Item` being updated.
+  """
+  patch: ItemPatch!
+  id: BigInt!
+}
+
+"""The output of our update `VehicleMileage` mutation."""
+type UpdateVehicleMileagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `VehicleMileage` that was updated by this mutation."""
+  vehicleMileage: VehicleMileage
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Vehicle` that is related to this `VehicleMileage`."""
+  vehicle: Vehicle
+
+  """An edge for our `VehicleMileage`. May be used by Relay 1."""
+  vehicleMileageEdge(
+    """The method to use when ordering `VehicleMileage`."""
+    orderBy: [VehicleMileagesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): VehicleMileagesEdge
+}
+
+"""All input for the `updateVehicleMileageByNodeId` mutation."""
+input UpdateVehicleMileageByNodeIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `VehicleMileage` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `VehicleMileage` being updated.
+  """
+  patch: VehicleMileagePatch!
+}
+
+"""
+Represents an update to a `VehicleMileage`. Fields that are set will be updated.
+"""
+input VehicleMileagePatch {
+  id: BigInt
+  vehicleId: BigInt
+  mileage: Int
+  recordDate: Datetime
+}
+
+"""All input for the `updateVehicleMileage` mutation."""
+input UpdateVehicleMileageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `VehicleMileage` being updated.
+  """
+  patch: VehicleMileagePatch!
+  id: BigInt!
+}
+
+"""The output of our update `Vehicle` mutation."""
+type UpdateVehiclePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Vehicle` that was updated by this mutation."""
+  vehicle: Vehicle
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Item` that is related to this `Vehicle`."""
+  item: Item
+
+  """An edge for our `Vehicle`. May be used by Relay 1."""
+  vehicleEdge(
+    """The method to use when ordering `Vehicle`."""
+    orderBy: [VehiclesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): VehiclesEdge
+}
+
+"""All input for the `updateVehicleByNodeId` mutation."""
+input UpdateVehicleByNodeIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Vehicle` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Vehicle` being updated.
+  """
+  patch: VehiclePatch!
+}
+
+"""
+Represents an update to a `Vehicle`. Fields that are set will be updated.
+"""
+input VehiclePatch {
+  itemId: BigInt
+  chassisNo: String
+  licenseNo: String
+  name: String
+  description: String
+  purchaseMileage: BigInt
+  manufacturer: String
+  manufactureYear: Int
+  manufactureCountry: String
+  model: String
+  color: String
+  wheelcount: Int
+  engineCc: Int
+  transmissionType: String
+  fuelType: String
+  steeringType: String
+  brakeType: String
+  driveType: String
+  fuelCapacity: BigFloat
+  fuelEfficiencyKmL: BigFloat
+  maxPassengers: Int
+  maxCargoKg: BigFloat
+  maxCargoCap: BigFloat
+  ammenities: JSON
+}
+
+"""All input for the `updateVehicle` mutation."""
+input UpdateVehicleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Vehicle` being updated.
+  """
+  patch: VehiclePatch!
+  itemId: BigInt!
+}
+
+"""The output of our delete `Item` mutation."""
+type DeleteItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Item` that was deleted by this mutation."""
+  item: Item
+  deletedItemNodeId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Item`. May be used by Relay 1."""
+  itemEdge(
+    """The method to use when ordering `Item`."""
+    orderBy: [ItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ItemsEdge
+}
+
+"""All input for the `deleteItemByNodeId` mutation."""
+input DeleteItemByNodeIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Item` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the `deleteItem` mutation."""
+input DeleteItemInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: BigInt!
+}
+
+"""The output of our delete `VehicleMileage` mutation."""
+type DeleteVehicleMileagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `VehicleMileage` that was deleted by this mutation."""
+  vehicleMileage: VehicleMileage
+  deletedVehicleMileageNodeId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Vehicle` that is related to this `VehicleMileage`."""
+  vehicle: Vehicle
+
+  """An edge for our `VehicleMileage`. May be used by Relay 1."""
+  vehicleMileageEdge(
+    """The method to use when ordering `VehicleMileage`."""
+    orderBy: [VehicleMileagesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): VehicleMileagesEdge
+}
+
+"""All input for the `deleteVehicleMileageByNodeId` mutation."""
+input DeleteVehicleMileageByNodeIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `VehicleMileage` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the `deleteVehicleMileage` mutation."""
+input DeleteVehicleMileageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: BigInt!
+}
+
+"""The output of our delete `Vehicle` mutation."""
+type DeleteVehiclePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Vehicle` that was deleted by this mutation."""
+  vehicle: Vehicle
+  deletedVehicleNodeId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Item` that is related to this `Vehicle`."""
+  item: Item
+
+  """An edge for our `Vehicle`. May be used by Relay 1."""
+  vehicleEdge(
+    """The method to use when ordering `Vehicle`."""
+    orderBy: [VehiclesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): VehiclesEdge
+}
+
+"""All input for the `deleteVehicleByNodeId` mutation."""
+input DeleteVehicleByNodeIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Vehicle` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the `deleteVehicle` mutation."""
+input DeleteVehicleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  itemId: BigInt!
+}

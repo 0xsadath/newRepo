@@ -1,0 +1,11 @@
+query ItemQuery {
+  items {
+    nodes {
+      description
+      id
+      name
+      nodeId
+      serial
+    }
+  }
+}
